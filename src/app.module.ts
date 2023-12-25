@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { AppService } from './app.service';
@@ -7,17 +8,27 @@ import { ObstacleModule } from './obstacle/obstacle.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: "mysql",
-      host: "localhost",
-      port: 3306,
-      username: "root",
-      password: "databaseTear299151119",
-      database: "prevent_disaster",
-      entities: ["dist/**/*.entity{.ts,.js}"],
-      synchronize: true
+    ConfigModule.forRoot({
+      envFilePath: ['.env'],
     }),
-    ObstacleModule
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => {
+        return {
+          type: "mysql",
+          host: "localhost",
+          port: 3306,
+          username: "root",
+          password: configService.get('DB_PASSWORD'),
+          database: "prevent_disaster",
+          entities: ["dist/**/*.entity{.ts,.js}"],
+          synchronize: true
+        }
+      }
+      
+    }),
+    ObstacleModule,
   ],
   controllers: [AppController],
   providers: [AppService],

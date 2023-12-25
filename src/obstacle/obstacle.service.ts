@@ -14,7 +14,18 @@ export class ObstacleService {
     private obstacleRepository: Repository<Obstacle>
   ) { }
 
+  async isIdDuplicated(id: number): Promise<boolean> {
+    const existingObstacle = await this.obstacleRepository.findOne({ where: { obstacle_id: id } });
+    return !!existingObstacle;
+  }
+
   create(createObstacleDto: CreateObstacleDto): Promise<Obstacle> {
+    const id = createObstacleDto.obstacle_id;
+
+    if (this.isIdDuplicated(id)) {
+      throw new Error(`Obstacle with ID ${id} already exists`);
+    }
+
     const newObstale = this.obstacleRepository.create(createObstacleDto);
     return this.obstacleRepository.save(newObstale);
   }

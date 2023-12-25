@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
 import { ObstacleService } from './obstacle.service';
 import { CreateObstacleDto } from './dto/create-obstacle.dto';
 import { UpdateObstacleDto } from './dto/update-obstacle.dto';
@@ -14,8 +14,12 @@ export class ObstacleController {
 
   @Post()
   async create(@Body() createObstacleDto: CreateObstacleDto) {
-    const convertedDto = this.convertData(createObstacleDto);
-    return await this.obstacleService.create(convertedDto);
+    try {
+      return await this.obstacleService.create(createObstacleDto);
+    } catch (error) {
+      console.error(error.message);
+      throw new BadRequestException('Error creating obstacle');
+    }
   }
 
   @Get()
@@ -45,8 +49,7 @@ export class ObstacleController {
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateObstacleDto: UpdateObstacleDto) {
-    const convertedDto = this.convertData(updateObstacleDto);
-    return await this.obstacleService.update(Number(id), convertedDto);
+    return await this.obstacleService.update(Number(id), updateObstacleDto);
   }
 
   @Delete(':id')
