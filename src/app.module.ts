@@ -20,7 +20,7 @@ import { ObstacleModule } from './obstacle/obstacle.module';
           host: "localhost",
           port: 3306,
           username: "root",
-          password: configService.get('DB_PASSWORD'),
+          password: "1475963",
           database: "prevent_disaster",
           entities: ["dist/**/*.entity{.ts,.js}"],
           synchronize: true
